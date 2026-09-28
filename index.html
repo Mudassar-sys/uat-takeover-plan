@@ -129,7 +129,7 @@ h1,h2,h3{line-height:1.12;letter-spacing:-.022em;margin:0}
 @media (max-width:560px){.nav-mark span{display:none}}
 
 /* hero */
-.hero{padding:72px 0 40px}
+.hero{padding:72px 0 40px;scroll-margin-top:80px}
 @media (min-width:900px){.hero{padding:112px 0 64px}}
 .hero-grid{display:grid;gap:40px}
 @media (min-width:980px){.hero-grid{grid-template-columns:1.35fr .85fr;align-items:end}}
@@ -254,15 +254,15 @@ section.sec{padding:56px 0;scroll-margin-top:72px}
 .app-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--card)}
 .dots{display:flex;gap:6px;flex:none}
 .dots i{width:10px;height:10px;border-radius:50%;background:var(--line-strong);display:block}
-.app-title{font-weight:650;font-size:14.5px;flex:1;min-width:0}
+.app-title{font-weight:650;font-size:14.5px;flex:1 1 170px;min-width:0;margin:0}
 .app-body{padding:14px;flex:1}
 .illus{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:650;letter-spacing:.02em;padding:3px 9px;border-radius:999px;color:var(--badge-amber-fg);background:var(--badge-amber-bg);border:1px solid var(--line);white-space:nowrap}
 table.ui{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 table.ui th{text-align:left;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:8px 10px;border-bottom:1px solid var(--line)}
 table.ui td{padding:12px 10px;vertical-align:top;border-bottom:1px solid var(--line)}
 table.ui tr:last-child td{border-bottom:0}
-.mono{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--badge-indigo-fg)}
-.status{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:650;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.mono{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--badge-indigo-fg);white-space:nowrap}
+.status{justify-self:start;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:650;padding:3px 9px;border-radius:999px;white-space:nowrap}
 .st-teal{color:var(--badge-teal-fg);background:var(--badge-teal-bg)}
 .st-indigo{color:var(--badge-indigo-fg);background:var(--badge-indigo-bg)}
 .st-amber{color:var(--badge-amber-fg);background:var(--badge-amber-bg)}
@@ -284,11 +284,11 @@ table.ui tr:last-child td{border-bottom:0}
 .ticket dt{color:var(--faint)}
 .ticket dd{margin:0}
 @media (max-width:640px){
-  table.ui thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  table.ui,table.ui tbody,table.ui tr,table.ui td{display:block;width:100%}
-  table.ui td{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:8px 4px;border-bottom:1px solid var(--line)}
-  table.ui td::before{content:attr(data-label);font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding-top:2px}
-  table.ui tr:last-child td:last-child{border-bottom:0}
+  table.ui.stack thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  table.ui.stack,table.ui.stack tbody,table.ui.stack tr,table.ui.stack td{display:block;width:100%}
+  table.ui.stack td{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:8px 4px;border-bottom:1px solid var(--line)}
+  table.ui.stack td::before{content:attr(data-label);font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding-top:2px}
+  table.ui.stack tr:last-child td:last-child{border-bottom:0}
   .kv{grid-template-columns:1fr;gap:2px}
   .kv dd{margin-bottom:10px}
 }
@@ -477,7 +477,7 @@ footer a:hover{color:var(--text);text-decoration:underline}
     <div class="sec-head reveal">
       <span class="kicker">03 / Roadmap</span>
       <h2 id="roadmap-title">Six weeks, from takeover to handover</h2>
-      <p>Weeks 1 and 2 are committed now. Weeks 3 to 6 get their dates in the Week 1 deliverables calendar.</p>
+      <p>Weeks 1 and 2 are committed now.</p>
     </div>
     <ol class="timeline">
       <li class="reveal">
@@ -713,9 +713,8 @@ footer a:hover{color:var(--text);text-decoration:underline}
         <rect class="node" x="36" y="200" width="238" height="180" rx="18"/>
         <text class="t" x="56" y="232">.NET backend on AWS</text>
         <rect class="node-2" x="54" y="254" width="202" height="104" rx="12"/>
-        <path d="M74 282a7 7 0 1 1 7 7h-2v7h-5v-5" fill="none" stroke="var(--dg-arrow)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        <text class="s" x="96" y="290">Secrets in</text>
-        <text class="t-sm" x="74" y="326">AWS Secrets Manager</text>
+        <text class="s" x="155" y="298" text-anchor="middle">Secrets in</text>
+        <text class="t-sm" x="155" y="320" text-anchor="middle">AWS Secrets Manager</text>
 
         <rect class="node" x="490" y="240" width="150" height="100" rx="16"/>
         <text class="t" x="565" y="286" text-anchor="middle">External</text>
@@ -728,9 +727,9 @@ footer a:hover{color:var(--text);text-decoration:underline}
         <text class="s" x="750" y="322" text-anchor="middle">External ID</text>
 
         <rect class="node gate" x="860" y="200" width="180" height="180" rx="18"/>
-        <text class="t" x="950" y="248" text-anchor="middle">Salesforce org</text>
-        <text class="s" x="950" y="280" text-anchor="middle">NPSP or</text>
-        <text class="s" x="950" y="299" text-anchor="middle">Agentforce Nonprofit,</text>
+        <text class="t" x="950" y="252" text-anchor="middle">Salesforce org</text>
+        <text class="s" x="950" y="286" text-anchor="middle">NPSP or</text>
+        <text class="s" x="950" y="306" text-anchor="middle">Agentforce Nonprofit,</text>
         <text class="s" x="950" y="326" text-anchor="middle">Service Cloud cases</text>
 
         <rect class="node" x="36" y="450" width="238" height="80" rx="16"/>
@@ -757,9 +756,8 @@ footer a:hover{color:var(--text);text-decoration:underline}
         <rect class="node" x="10" y="10" width="340" height="138" rx="16"/>
         <text class="t" x="26" y="40">.NET backend on AWS</text>
         <rect class="node-2" x="26" y="56" width="308" height="76" rx="12"/>
-        <path d="M44 88a7 7 0 1 1 7 7h-2v7h-5v-5" fill="none" stroke="var(--dg-arrow)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        <text class="s" x="66" y="88">Secrets in</text>
-        <text class="t-sm" x="66" y="110">AWS Secrets Manager</text>
+        <text class="s" x="180" y="89" text-anchor="middle">Secrets in</text>
+        <text class="t-sm" x="180" y="110" text-anchor="middle">AWS Secrets Manager</text>
 
         <rect class="node" x="236" y="206" width="114" height="100" rx="14"/>
         <text class="s" x="293" y="236" text-anchor="middle">Retry, then</text>
@@ -840,7 +838,7 @@ footer a:hover{color:var(--text);text-decoration:underline}
       <article class="app reveal" aria-labelledby="app1">
         <div class="app-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><h3 class="app-title" id="app1">Requirements matrix</h3><span class="illus">Illustrative format, not your data</span></div>
         <div class="app-body">
-          <table class="ui">
+          <table class="ui stack">
             <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Built</th><th scope="col">Script</th><th scope="col">Status</th></tr></thead>
             <tbody><tr>
               <td data-label="ID"><span class="mono">REQ-014</span></td>
@@ -888,11 +886,11 @@ footer a:hover{color:var(--text);text-decoration:underline}
         <div class="app-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><h3 class="app-title" id="app4">Weekly deliverables, Week 2</h3><span class="illus">Illustrative format, not your data</span></div>
         <div class="app-body">
           <table class="ui">
-            <thead><tr><th scope="col">Day</th><th scope="col">Deliverable</th><th scope="col">State</th></tr></thead>
+            <thead><tr><th scope="col">Day</th><th scope="col">Deliverable</th></tr></thead>
             <tbody>
-              <tr><td data-label="Day"><span class="mono">Mon</span></td><td data-label="Deliverable">Scripts for fundraising roles</td><td data-label="State"><span class="status st-indigo">Scheduled</span></td></tr>
-              <tr><td data-label="Day"><span class="mono">Wed</span></td><td data-label="Deliverable">Integration test cases for three website flows</td><td data-label="State"><span class="status st-indigo">Scheduled</span></td></tr>
-              <tr><td data-label="Day"><span class="mono">Fri</span></td><td data-label="Deliverable">Entry criteria sign-off</td><td data-label="State"><span class="status st-indigo">Scheduled</span></td></tr>
+              <tr><td data-label="Day"><span class="mono">Mon</span></td><td data-label="Deliverable">Scripts for fundraising roles</td></tr>
+              <tr><td data-label="Day"><span class="mono">Wed</span></td><td data-label="Deliverable">Integration test cases for three website flows</td></tr>
+              <tr><td data-label="Day"><span class="mono">Fri</span></td><td data-label="Deliverable">Entry criteria sign-off</td></tr>
             </tbody>
           </table>
         </div>
@@ -950,13 +948,13 @@ footer a:hover{color:var(--text);text-decoration:underline}
       <h2 id="needs-title">What we need from you, in writing</h2>
     </div>
     <ul class="needs">
-      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Discovery recordings</li>
-      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Sandbox access and read-only production access</li>
-      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Access to your defect tool (Trello or Asana)</li>
-      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>A contact on the website team</li>
-      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>The current open-items list</li>
-      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>The target go-live date</li>
-      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>The number of business testers</li>
+      <li class="reveal"><span class="box" aria-hidden="true"></span>Discovery recordings</li>
+      <li class="reveal"><span class="box" aria-hidden="true"></span>Sandbox access and read-only production access</li>
+      <li class="reveal"><span class="box" aria-hidden="true"></span>Access to your defect tool (Trello or Asana)</li>
+      <li class="reveal"><span class="box" aria-hidden="true"></span>A contact on the website team</li>
+      <li class="reveal"><span class="box" aria-hidden="true"></span>The current open-items list</li>
+      <li class="reveal"><span class="box" aria-hidden="true"></span>The target go-live date</li>
+      <li class="reveal"><span class="box" aria-hidden="true"></span>The number of business testers</li>
     </ul>
   </div>
 </section>
