@@ -119,7 +119,8 @@ h1,h2,h3{line-height:1.12;letter-spacing:-.022em;margin:0}
 .nav-mark{flex:none;display:inline-flex;align-items:center;gap:9px;font-weight:650;font-size:14px;letter-spacing:.01em;text-decoration:none;color:var(--text)}
 .nav-mark svg{width:24px;height:24px}
 .nav-mark span{white-space:nowrap}
-.nav ol{list-style:none;margin:0;padding:6px 2px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent);flex:1;min-width:0}
+.nav nav{flex:1 1 auto;min-width:0}
+.nav ol{width:100%;list-style:none;margin:0;padding:6px 2px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent);flex:1;min-width:0}
 .nav ol::-webkit-scrollbar{display:none}
 .nav li{flex:none}
 .nav a.pill{display:block;padding:7px 12px;border-radius:999px;font-size:13.5px;font-weight:550;color:var(--muted);text-decoration:none;border:1px solid transparent;white-space:nowrap}
@@ -202,7 +203,7 @@ section.sec{padding:56px 0;scroll-margin-top:72px}
 /* diagrams */
 .diagram{border-radius:24px;padding:18px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
 @media (min-width:760px){.diagram{padding:26px}}
-.diagram svg{display:block;width:100%;height:auto}
+.diagram svg{width:100%;height:auto}
 .dg{font-family:var(--font)}
 .dg .node{fill:var(--dg-node);stroke:var(--dg-stroke);stroke-width:1.5}
 .dg .node-2{fill:var(--dg-node-2);stroke:var(--dg-stroke);stroke-width:1.2;stroke-dasharray:5 5}
@@ -219,9 +220,9 @@ section.sec{padding:56px 0;scroll-margin-top:72px}
 .dg .hd{fill:var(--dg-arrow)}
 .dg .pill{fill:var(--dg-pill);stroke:var(--dg-stroke);stroke-width:1.2}
 .dg .pt{fill:var(--dg-text);font-weight:600;font-size:12.5px}
-.only-wide{display:none}
-.only-narrow{display:block}
-@media (min-width:760px){.only-wide{display:block}.only-narrow{display:none}}
+.diagram svg.only-wide{display:none}
+.diagram svg.only-narrow{display:block}
+@media (min-width:760px){.diagram svg.only-wide{display:block}.diagram svg.only-narrow{display:none}}
 .notes{display:grid;gap:14px;margin-top:18px}
 @media (min-width:860px){.notes{grid-template-columns:repeat(3,1fr)}}
 .notes .card{padding:20px}
@@ -346,8 +347,8 @@ footer a:hover{color:var(--text);text-decoration:underline}
   section.sec{padding:22px 0}
   .hero{padding:10px 0 20px}
   .fx .reveal{opacity:1!important;transform:none!important}
-  .only-wide{display:block!important}
-  .only-narrow{display:none!important}
+  .diagram svg.only-wide{display:block!important}
+  .diagram svg.only-narrow{display:none!important}
   .hero h1 em{color:#000;background:none}
   .sources a::after{content:" " attr(href);font-weight:400;font-size:9pt;overflow-wrap:anywhere}
 }
@@ -386,7 +387,7 @@ footer a:hover{color:var(--text);text-decoration:underline}
 
 <section class="hero" id="top" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
-    <div class="reveal">
+    <div>
       <p class="eyebrow">Salesforce UAT takeover plan</p>
       <h1 id="hero-title">From build complete to a <em>clean go-live.</em></h1>
       <p class="lede">A plan for taking over a nonprofit Salesforce implementation as it moves into UAT, with a website backend on .NET and AWS in the loop.</p>
@@ -400,7 +401,7 @@ footer a:hover{color:var(--text);text-decoration:underline}
         <a class="btn btn-2" href="#integration">See the architecture</a>
       </div>
     </div>
-    <aside class="glance reveal" aria-labelledby="glance-title">
+    <aside class="glance" aria-labelledby="glance-title">
       <h2 id="glance-title">At a glance</h2>
       <dl>
         <div><dt>6</dt><dd>weeks from takeover to handover</dd></div>
