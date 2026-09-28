@@ -1,0 +1,1072 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UAT Takeover Plan</title>
+<meta name="description" content="A plan for taking a nonprofit Salesforce implementation from build complete through UAT to a clean go-live, with a .NET and AWS website backend in the loop.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0B1020" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F5F7FC" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230B1020'/%3E%3Cpath d='M18 34l9 9 19-21' fill='none' stroke='%235EEAD4' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0B1020;
+  --bg-raised:#11172C;
+  --text:#E9EDF7;
+  --muted:#AEB8D0;
+  --faint:#95A0BB;
+  --line:rgba(255,255,255,.10);
+  --line-strong:rgba(255,255,255,.18);
+  --card:rgba(255,255,255,.045);
+  --card-strong:rgba(255,255,255,.07);
+  --teal:#5EEAD4;
+  --indigo:#A5B4FC;
+  --glow-1:rgba(45,212,191,.20);
+  --glow-2:rgba(99,102,241,.26);
+  --badge-teal-bg:rgba(94,234,212,.12);
+  --badge-teal-fg:#7FF0DE;
+  --badge-indigo-bg:rgba(165,180,252,.12);
+  --badge-indigo-fg:#C9D1FF;
+  --badge-amber-bg:rgba(251,191,36,.12);
+  --badge-amber-fg:#FCD679;
+  --nav-bg:rgba(11,16,32,.74);
+  --btn-bg:linear-gradient(135deg,#5EEAD4,#A5B4FC);
+  --btn-fg:#0B1020;
+  --btn-2-bg:rgba(255,255,255,.06);
+  --shadow:0 1px 0 rgba(255,255,255,.05) inset,0 24px 60px -36px rgba(0,0,0,.9);
+  --dg-node:#121932;
+  --dg-node-2:#0E1429;
+  --dg-stroke:rgba(165,180,252,.38);
+  --dg-text:#E9EDF7;
+  --dg-muted:#AEB8D0;
+  --dg-arrow:#7FF0DE;
+  --dg-region:rgba(255,255,255,.025);
+  --dg-region-stroke:rgba(255,255,255,.14);
+  --dg-pill:#0B1020;
+  --radius:20px;
+  --font:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#F5F7FC;
+    --bg-raised:#FFFFFF;
+    --text:#0B1020;
+    --muted:#454F69;
+    --faint:#56607B;
+    --line:rgba(11,16,32,.10);
+    --line-strong:rgba(11,16,32,.18);
+    --card:rgba(255,255,255,.74);
+    --card-strong:#FFFFFF;
+    --teal:#0F766E;
+    --indigo:#4338CA;
+    --glow-1:rgba(45,212,191,.22);
+    --glow-2:rgba(99,102,241,.16);
+    --badge-teal-bg:rgba(15,118,110,.10);
+    --badge-teal-fg:#0B5F58;
+    --badge-indigo-bg:rgba(67,56,202,.09);
+    --badge-indigo-fg:#3730A3;
+    --badge-amber-bg:rgba(180,83,9,.10);
+    --badge-amber-fg:#8A3B06;
+    --nav-bg:rgba(245,247,252,.82);
+    --btn-bg:linear-gradient(135deg,#0F766E,#4338CA);
+    --btn-fg:#FFFFFF;
+    --btn-2-bg:rgba(255,255,255,.8);
+    --shadow:0 1px 0 rgba(255,255,255,.8) inset,0 24px 50px -34px rgba(11,16,32,.35);
+    --dg-node:#FFFFFF;
+    --dg-node-2:#F2F5FC;
+    --dg-stroke:rgba(67,56,202,.35);
+    --dg-text:#0B1020;
+    --dg-muted:#454F69;
+    --dg-arrow:#0F766E;
+    --dg-region:rgba(11,16,32,.025);
+    --dg-region-stroke:rgba(11,16,32,.16);
+    --dg-pill:#F5F7FC;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+body{
+  margin:0;
+  font-family:var(--font);
+  font-size:17px;
+  line-height:1.6;
+  color:var(--text);
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(900px 600px at 8% -8%,var(--glow-1),transparent 62%),
+    radial-gradient(1000px 700px at 100% 4%,var(--glow-2),transparent 60%),
+    radial-gradient(800px 600px at 50% 110%,var(--glow-1),transparent 65%);
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+  overflow-x:hidden;
+}
+a{color:inherit}
+p{margin:0 0 1em}
+h1,h2,h3{line-height:1.12;letter-spacing:-.022em;margin:0}
+.skip{position:absolute;left:-9999px;top:8px;background:var(--bg-raised);color:var(--text);padding:10px 14px;border-radius:10px;z-index:100}
+.skip:focus{left:16px}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:1140px;margin:0 auto;padding:0 16px}
+@media (min-width:700px){.wrap{padding:0 28px}}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:var(--nav-bg);-webkit-backdrop-filter:saturate(160%) blur(16px);backdrop-filter:saturate(160%) blur(16px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:14px;min-height:58px}
+.nav-mark{flex:none;display:inline-flex;align-items:center;gap:9px;font-weight:650;font-size:14px;letter-spacing:.01em;text-decoration:none;color:var(--text)}
+.nav-mark svg{width:24px;height:24px}
+.nav-mark span{white-space:nowrap}
+.nav ol{list-style:none;margin:0;padding:6px 2px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent);flex:1;min-width:0}
+.nav ol::-webkit-scrollbar{display:none}
+.nav li{flex:none}
+.nav a.pill{display:block;padding:7px 12px;border-radius:999px;font-size:13.5px;font-weight:550;color:var(--muted);text-decoration:none;border:1px solid transparent;white-space:nowrap}
+.nav a.pill:hover{color:var(--text);background:var(--card)}
+.nav a.pill.on{color:var(--text);background:var(--card-strong);border-color:var(--line-strong)}
+@media (max-width:560px){.nav-mark span{display:none}}
+
+/* hero */
+.hero{padding:72px 0 40px}
+@media (min-width:900px){.hero{padding:112px 0 64px}}
+.hero-grid{display:grid;gap:40px}
+@media (min-width:980px){.hero-grid{grid-template-columns:1.35fr .85fr;align-items:end}}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:650;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:22px}
+.eyebrow::before{content:"";width:28px;height:1px;background:currentColor}
+.hero h1{font-size:clamp(2.5rem,7.2vw,5.1rem);font-weight:750;letter-spacing:-.04em;max-width:14ch}
+.hero h1 em{font-style:normal;background:linear-gradient(120deg,var(--teal),var(--indigo));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:clamp(1.08rem,2.2vw,1.3rem);color:var(--muted);max-width:40rem;margin:26px 0 30px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;list-style:none;padding:0;margin:0 0 34px}
+.chips li{display:inline-flex;align-items:center;gap:9px;padding:9px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:14.5px;font-weight:550}
+.chips li svg{width:16px;height:16px;flex:none;color:var(--teal)}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:14px;font-weight:650;font-size:15.5px;text-decoration:none;border:1px solid transparent;transition:transform .2s ease,box-shadow .2s ease}
+.btn-1{background:var(--btn-bg);color:var(--btn-fg);box-shadow:0 12px 30px -14px rgba(94,234,212,.55)}
+.btn-2{background:var(--btn-2-bg);border-color:var(--line-strong);color:var(--text)}
+.btn:hover{transform:translateY(-1px)}
+.btn svg{width:16px;height:16px}
+.glance{border-radius:24px;padding:22px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.glance h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:650;margin-bottom:14px}
+.glance dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0}
+.glance div{padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.glance dt{font-size:30px;font-weight:750;letter-spacing:-.03em;line-height:1.1}
+.glance dd{margin:4px 0 0;font-size:14px;color:var(--muted);line-height:1.35}
+
+/* sections */
+section.sec{padding:56px 0;scroll-margin-top:72px}
+@media (min-width:900px){section.sec{padding:84px 0}}
+.sec-head{display:grid;gap:14px;margin-bottom:32px;max-width:48rem}
+.kicker{font-family:var(--mono);font-size:13px;color:var(--teal);letter-spacing:.06em}
+.sec h2{font-size:clamp(1.8rem,4.4vw,2.9rem);font-weight:720}
+.sec-head p{color:var(--muted);font-size:1.08rem;margin:0}
+.card{position:relative;border-radius:var(--radius);padding:24px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.card h3{font-size:1.2rem;font-weight:680;margin-bottom:10px}
+.card p{color:var(--muted);margin:0}
+.grid-2{display:grid;gap:16px}
+@media (min-width:760px){.grid-2{grid-template-columns:1fr 1fr}}
+.grid-3{display:grid;gap:16px}
+@media (min-width:860px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+.num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:11px;font-weight:700;font-size:14px;margin-bottom:16px;color:var(--badge-teal-fg);background:var(--badge-teal-bg);border:1px solid var(--line)}
+.note{margin-top:22px;padding:16px 18px;border-radius:16px;border:1px dashed var(--line-strong);color:var(--muted);font-size:15px}
+.note p{margin:0}
+.cite{display:inline-block;font-family:var(--mono);font-size:.78em;font-weight:600;padding:1px 6px;margin:0 1px;border-radius:6px;text-decoration:none;color:var(--badge-indigo-fg);background:var(--badge-indigo-bg);vertical-align:1px;white-space:nowrap}
+.cite:hover{text-decoration:underline}
+
+/* how we work */
+.how{display:grid;gap:14px;counter-reset:how}
+@media (min-width:760px){.how{grid-template-columns:1fr 1fr}}
+.how li{list-style:none}
+.how .card{height:100%}
+.how .card p{color:var(--text);font-size:1.04rem}
+.how .card p + p{color:var(--muted);font-size:.97rem;margin-top:8px}
+
+/* timeline */
+.timeline{list-style:none;margin:0;padding:0;position:relative}
+.timeline::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,var(--teal),var(--indigo) 60%,transparent)}
+.timeline > li{position:relative;padding-left:48px;margin-bottom:18px}
+.timeline > li::before{content:"";position:absolute;left:8px;top:26px;width:16px;height:16px;border-radius:50%;background:var(--bg);border:3px solid var(--teal);box-shadow:0 0 0 5px var(--badge-teal-bg)}
+.timeline > li.later::before{border-color:var(--indigo);box-shadow:0 0 0 5px var(--badge-indigo-bg)}
+.tl-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:12px}
+.tl-week{font-family:var(--mono);font-size:13px;color:var(--faint);letter-spacing:.04em}
+.tl-head h3{font-size:1.28rem;margin:0;flex-basis:100%}
+@media (min-width:640px){.tl-head h3{flex-basis:auto}}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12.5px;font-weight:650;letter-spacing:.01em;white-space:nowrap}
+.badge-teal{color:var(--badge-teal-fg);background:var(--badge-teal-bg);border:1px solid var(--line)}
+.badge-indigo{color:var(--badge-indigo-fg);background:var(--badge-indigo-bg);border:1px solid var(--line)}
+.badge-amber{color:var(--badge-amber-fg);background:var(--badge-amber-bg);border:1px solid var(--line)}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.deliv{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.deliv li{font-size:14.5px;padding:6px 11px;border-radius:10px;background:var(--card);border:1px solid var(--line);color:var(--text)}
+
+/* diagrams */
+.diagram{border-radius:24px;padding:18px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+@media (min-width:760px){.diagram{padding:26px}}
+.diagram svg{display:block;width:100%;height:auto}
+.dg{font-family:var(--font)}
+.dg .node{fill:var(--dg-node);stroke:var(--dg-stroke);stroke-width:1.5}
+.dg .node-2{fill:var(--dg-node-2);stroke:var(--dg-stroke);stroke-width:1.2;stroke-dasharray:5 5}
+.dg .gate{stroke:var(--dg-arrow);stroke-width:2.2}
+.dg .region{fill:var(--dg-region);stroke:var(--dg-region-stroke);stroke-width:1.2;stroke-dasharray:4 6}
+.dg .t{fill:var(--dg-text);font-weight:650;font-size:15px}
+.dg .t-sm{fill:var(--dg-text);font-weight:600;font-size:14px}
+.dg .s{fill:var(--dg-muted);font-weight:500;font-size:13px}
+.dg .rl{fill:var(--dg-muted);font-weight:700;font-size:12px;letter-spacing:.14em}
+.dg .n-c{fill:var(--badge-teal-bg);stroke:var(--dg-arrow);stroke-width:1.2}
+.dg .n-t{fill:var(--dg-arrow);font-weight:700;font-size:12px}
+.dg .ar{stroke:var(--dg-arrow);stroke-width:2;fill:none}
+.dg .ar-d{stroke:var(--dg-arrow);stroke-width:2;fill:none;stroke-dasharray:6 6}
+.dg .hd{fill:var(--dg-arrow)}
+.dg .pill{fill:var(--dg-pill);stroke:var(--dg-stroke);stroke-width:1.2}
+.dg .pt{fill:var(--dg-text);font-weight:600;font-size:12.5px}
+.only-wide{display:none}
+.only-narrow{display:block}
+@media (min-width:760px){.only-wide{display:block}.only-narrow{display:none}}
+.notes{display:grid;gap:14px;margin-top:18px}
+@media (min-width:860px){.notes{grid-template-columns:repeat(3,1fr)}}
+.notes .card{padding:20px}
+.notes .card p{color:var(--text);font-size:15.5px}
+.notes .num{width:28px;height:28px;font-size:13px;margin-bottom:12px}
+
+/* checkpoints */
+.checks{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:12px;counter-reset:ck}
+@media (min-width:860px){.checks{grid-template-columns:1fr 1fr}}
+.checks li{counter-increment:ck;position:relative;padding:16px 18px 16px 62px;border-radius:16px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:15.5px}
+.checks li::before{content:counter(ck,decimal-leading-zero);position:absolute;left:16px;top:15px;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--teal);padding:3px 6px;border-radius:8px;background:var(--badge-teal-bg)}
+.checks strong{color:var(--text);font-weight:650}
+
+/* callout */
+.callout{position:relative;overflow:hidden;border-radius:26px;padding:30px 24px;border:1px solid var(--line-strong);background:
+  radial-gradient(600px 300px at 0% 0%,var(--glow-1),transparent 70%),
+  radial-gradient(600px 300px at 100% 100%,var(--glow-2),transparent 70%),
+  var(--card);box-shadow:var(--shadow)}
+@media (min-width:760px){.callout{padding:42px 44px}}
+.callout h2{font-size:clamp(1.6rem,3.8vw,2.4rem);margin:10px 0 16px;max-width:22ch}
+.callout p{font-size:1.1rem;max-width:52rem;margin:0}
+.callout .icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--badge-amber-bg);color:var(--badge-amber-fg);border:1px solid var(--line)}
+.callout .icon svg{width:22px;height:22px}
+
+/* app artifacts */
+.apps{display:grid;gap:18px}
+@media (min-width:980px){.apps{grid-template-columns:1fr 1fr}}
+.app{border-radius:18px;overflow:hidden;background:var(--bg-raised);border:1px solid var(--line-strong);box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.app-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--card)}
+.dots{display:flex;gap:6px;flex:none}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line-strong);display:block}
+.app-title{font-weight:650;font-size:14.5px;flex:1;min-width:0}
+.app-body{padding:14px;flex:1}
+.illus{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:650;letter-spacing:.02em;padding:3px 9px;border-radius:999px;color:var(--badge-amber-fg);background:var(--badge-amber-bg);border:1px solid var(--line);white-space:nowrap}
+table.ui{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
+table.ui th{text-align:left;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:8px 10px;border-bottom:1px solid var(--line)}
+table.ui td{padding:12px 10px;vertical-align:top;border-bottom:1px solid var(--line)}
+table.ui tr:last-child td{border-bottom:0}
+.mono{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--badge-indigo-fg)}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:650;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.st-teal{color:var(--badge-teal-fg);background:var(--badge-teal-bg)}
+.st-indigo{color:var(--badge-indigo-fg);background:var(--badge-indigo-bg)}
+.st-amber{color:var(--badge-amber-fg);background:var(--badge-amber-bg)}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:10px 14px;margin:0;font-size:14.5px}
+.kv dt{color:var(--faint);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding-top:2px}
+.kv dd{margin:0}
+.kv ol{margin:0;padding-left:18px}
+.pf{display:inline-flex;gap:6px}
+.pf span{font-size:12.5px;font-weight:650;padding:3px 10px;border-radius:8px;border:1px solid var(--line-strong)}
+.kanban{display:grid;gap:12px}
+@media (min-width:560px){.kanban{grid-template-columns:1fr 1.3fr}}
+.lane{border-radius:14px;padding:10px;background:var(--card);border:1px dashed var(--line-strong)}
+.lane h4{margin:2px 4px 10px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.ghost{height:44px;border-radius:10px;border:1px dashed var(--line);margin-bottom:8px}
+.ticket{border-radius:12px;padding:12px;background:var(--bg-raised);border:1px solid var(--line-strong)}
+.ticket .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+.ticket p{margin:0 0 10px;font-weight:620;font-size:15px}
+.ticket dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0;font-size:13.5px}
+.ticket dt{color:var(--faint)}
+.ticket dd{margin:0}
+@media (max-width:640px){
+  table.ui thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  table.ui,table.ui tbody,table.ui tr,table.ui td{display:block;width:100%}
+  table.ui td{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:8px 4px;border-bottom:1px solid var(--line)}
+  table.ui td::before{content:attr(data-label);font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding-top:2px}
+  table.ui tr:last-child td:last-child{border-bottom:0}
+  .kv{grid-template-columns:1fr;gap:2px}
+  .kv dd{margin-bottom:10px}
+}
+
+/* governance, team, scope, needs */
+.cadence .card h3{display:flex;align-items:center;gap:10px}
+.cadence ul,.scope ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.cadence li,.scope li{position:relative;padding-left:22px;color:var(--muted);font-size:15.5px}
+.cadence li::before,.scope li::before{content:"";position:absolute;left:2px;top:.62em;width:8px;height:8px;border-radius:3px;background:var(--teal)}
+.scope .out li::before{background:transparent;border:1.5px solid var(--faint)}
+.team{display:grid;gap:18px}
+@media (min-width:900px){.team{grid-template-columns:1.2fr 1fr;align-items:center}}
+.team p.big{font-size:clamp(1.12rem,2.3vw,1.34rem);color:var(--text);margin:0}
+.roles{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}
+.roles li{padding:8px 13px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:14.5px;font-weight:560}
+.needs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+@media (min-width:760px){.needs{grid-template-columns:1fr 1fr}}
+.needs li{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:15.5px}
+.box{flex:none;width:20px;height:20px;border-radius:6px;border:1.5px solid var(--teal);margin-top:2px;display:grid;place-items:center}
+.box svg{width:12px;height:12px;color:var(--teal);opacity:.55}
+.qs{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:q}
+@media (min-width:860px){.qs{grid-template-columns:1fr 1fr}}
+.qs li{counter-increment:q;position:relative;padding:22px 22px 22px 76px;border-radius:18px;background:var(--card);border:1px solid var(--line);font-size:1.06rem;box-shadow:var(--shadow)}
+.qs li::before{content:counter(q);position:absolute;left:20px;top:18px;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-weight:750;font-size:18px;color:var(--btn-fg);background:var(--btn-bg)}
+
+/* sources */
+.sources{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+@media (min-width:860px){.sources{grid-template-columns:1fr 1fr}}
+.sources li{scroll-margin-top:80px;display:grid;grid-template-columns:48px 1fr;gap:10px;align-items:start;padding:14px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.sources li:target{border-color:var(--teal);box-shadow:0 0 0 3px var(--badge-teal-bg)}
+.src-id{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--badge-indigo-fg);background:var(--badge-indigo-bg);border-radius:8px;padding:3px 0;text-align:center}
+.sources a{font-weight:620;font-size:15px;text-decoration:none}
+.sources a:hover{text-decoration:underline}
+.sources .dom{display:block;font-size:13px;color:var(--faint);margin-top:2px;overflow-wrap:anywhere}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:34px 0 46px;margin-top:30px}
+footer nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 18px}
+footer a{color:var(--muted);text-decoration:none;font-size:14px}
+footer a:hover{color:var(--text);text-decoration:underline}
+
+/* reveal */
+.fx .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.fx .reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .fx .reveal{opacity:1!important;transform:none!important}
+}
+
+/* print */
+@media print{
+  :root{--bg:#fff;--bg-raised:#fff;--text:#000;--muted:#222;--faint:#333;--line:#bbb;--line-strong:#888;--card:#fff;--card-strong:#fff;--teal:#0F766E;--indigo:#3730A3;--badge-teal-bg:#fff;--badge-teal-fg:#0B5F58;--badge-indigo-bg:#fff;--badge-indigo-fg:#3730A3;--badge-amber-bg:#fff;--badge-amber-fg:#7A3406;--btn-bg:#fff;--btn-fg:#000;--dg-node:#fff;--dg-node-2:#fff;--dg-stroke:#555;--dg-text:#000;--dg-muted:#222;--dg-arrow:#0F766E;--dg-region:#fff;--dg-region-stroke:#999;--dg-pill:#fff;--shadow:none}
+  body{background:#fff;font-size:11.5pt}
+  .nav,.actions,.skip{display:none!important}
+  .card,.app,.callout,.glance,.diagram,.checks li,.qs li,.sources li,.needs li{box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;break-inside:avoid}
+  section.sec{padding:22px 0}
+  .hero{padding:10px 0 20px}
+  .fx .reveal{opacity:1!important;transform:none!important}
+  .only-wide{display:block!important}
+  .only-narrow{display:none!important}
+  .hero h1 em{color:#000;background:none}
+  .sources a::after{content:" " attr(href);font-weight:400;font-size:9pt;overflow-wrap:anywhere}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" aria-label="Section navigation">
+  <div class="wrap">
+    <a class="nav-mark" href="#top" aria-label="Back to top">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="7" fill="none" stroke="currentColor" stroke-opacity=".35"/><path d="M7 12.5l3.2 3.2L17 8.8" fill="none" stroke="#5EEAD4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>UAT plan</span>
+    </a>
+    <nav aria-label="Sections">
+      <ol id="navlist">
+        <li><a class="pill" href="#role">Role</a></li>
+        <li><a class="pill" href="#how">How we work</a></li>
+        <li><a class="pill" href="#roadmap">Roadmap</a></li>
+        <li><a class="pill" href="#uat-flow">UAT flow</a></li>
+        <li><a class="pill" href="#integration">Integration</a></li>
+        <li><a class="pill" href="#day-one">Day one</a></li>
+        <li><a class="pill" href="#weekly">Weekly artifacts</a></li>
+        <li><a class="pill" href="#governance">Governance</a></li>
+        <li><a class="pill" href="#team">Team</a></li>
+        <li><a class="pill" href="#scope">Scope</a></li>
+        <li><a class="pill" href="#needs">What we need</a></li>
+        <li><a class="pill" href="#questions">Questions</a></li>
+        <li><a class="pill" href="#sources">Sources</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="reveal">
+      <p class="eyebrow">Salesforce UAT takeover plan</p>
+      <h1 id="hero-title">From build complete to a <em>clean go-live.</em></h1>
+      <p class="lede">A plan for taking over a nonprofit Salesforce implementation as it moves into UAT, with a website backend on .NET and AWS in the loop.</p>
+      <ul class="chips" aria-label="Working terms">
+        <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.5V8l2.4 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>25 hours a week, committed</li>
+        <li><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2.5" width="12" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 6.5h6M5 9.5h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Deliverables named every week</li>
+        <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Each week approved before it's paid</li>
+      </ul>
+      <div class="actions">
+        <a class="btn btn-1" href="#roadmap">See the roadmap <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a class="btn btn-2" href="#integration">See the architecture</a>
+      </div>
+    </div>
+    <aside class="glance reveal" aria-labelledby="glance-title">
+      <h2 id="glance-title">At a glance</h2>
+      <dl>
+        <div><dt>6</dt><dd>weeks from takeover to handover</dd></div>
+        <div><dt>2</dt><dd>UAT cycles before go/no-go</dd></div>
+        <div><dt>10</dt><dd>integration checkpoints verified</dd></div>
+        <div><dt>1</dt><dd>lead as your point of contact</dd></div>
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<section class="sec" id="role" aria-labelledby="role-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">01 / The role</span>
+      <h2 id="role-title">The role, as we read it</h2>
+      <p>Four outcomes. Your engineers keep the build; this role owns requirements, testing and coordination.</p>
+    </div>
+    <div class="grid-2">
+      <article class="card reveal">
+        <span class="num" aria-hidden="true">1</span>
+        <h3>Requirements baseline</h3>
+        <p>Discovery recordings turned into one requirements matrix: each requirement, what was built for it, the UAT script that tests it, and its status. Open items closed with stakeholders and engineers and signed off in writing.</p>
+      </article>
+      <article class="card reveal">
+        <span class="num" aria-hidden="true">2</span>
+        <h3>UAT from start to finish</h3>
+        <p>Plan, scripts by role, entry and exit criteria, defect severity rules, daily triage, two test cycles and a written go/no-go.</p>
+      </article>
+      <article class="card reveal">
+        <span class="num" aria-hidden="true">3</span>
+        <h3>The website side</h3>
+        <p>Every .NET/AWS flow that writes to Salesforce mapped, tested end to end with the website team, and its authentication checked.</p>
+      </article>
+      <article class="card reveal">
+        <span class="num" aria-hidden="true">4</span>
+        <h3>Engagement ownership</h3>
+        <p>Weekly status, risk log and change control, then cutover, go-live, hypercare and a clean handover.</p>
+      </article>
+    </div>
+    <div class="note reveal">
+      <p>Salesforce describes the functional consultant as the person who leads and supports the customer through the implementation lifecycle, including analysis, design and development <a class="cite" href="#src-R1">R1</a>. Its Business Analyst certification covers discovery, stakeholder collaboration, process mapping, requirements, user stories and user acceptance <a class="cite" href="#src-R2">R2</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="how" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">02 / How we work</span>
+      <h2 id="how-title">How we work</h2>
+    </div>
+    <ul class="how" style="padding:0;margin:0">
+      <li class="reveal"><div class="card"><span class="num" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.5V8l2.4 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+        <p>25 hours a week committed to the role, up to 30 in the heavy UAT weeks.</p></div></li>
+      <li class="reveal"><div class="card"><span class="num" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="2" y="2.5" width="12" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 6.5h6M5 9.5h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+        <p>Every week starts with named deliverables and dates, agreed in writing.</p></div></li>
+      <li class="reveal"><div class="card"><span class="num" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <p>Each week is its own milestone. You review that week's deliverables and approve before it's paid.</p>
+        <p>Milestones are funded in escrow before work begins, and payment is released only once you approve the work. When a week is submitted, you approve it or request changes <a class="cite" href="#src-U1">U1</a>.</p></div></li>
+      <li class="reveal"><div class="card"><span class="num" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="5.5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 13.5c.8-2.6 2.7-3.8 5-3.8s4.2 1.2 5 3.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+        <p>One lead is your point of contact. Meetings and triage run in US Eastern hours, with a short written update every day.</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec" id="roadmap" aria-labelledby="roadmap-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">03 / Roadmap</span>
+      <h2 id="roadmap-title">Six weeks, from takeover to handover</h2>
+      <p>Weeks 1 and 2 are committed now. Weeks 3 to 6 get their dates in the Week 1 deliverables calendar.</p>
+    </div>
+    <ol class="timeline">
+      <li class="reveal">
+        <div class="card">
+          <div class="tl-head"><span class="tl-week">WEEK 1</span><h3>Takeover</h3><span class="badge badge-teal">Committed now</span></div>
+          <ul class="deliv">
+            <li>Access checklist closed</li>
+            <li>Requirements matrix v1 from the recordings</li>
+            <li>Open-items log</li>
+            <li>Stakeholder confirmation sessions</li>
+            <li>Website integration inventory v1</li>
+            <li>UAT plan draft</li>
+            <li>Dated deliverables calendar for weeks 2 to 4</li>
+          </ul>
+        </div>
+      </li>
+      <li class="reveal">
+        <div class="card">
+          <div class="tl-head"><span class="tl-week">WEEK 2</span><h3>UAT readiness</h3><span class="badge badge-teal">Committed now</span></div>
+          <ul class="deliv">
+            <li>UAT scripts by role</li>
+            <li>Test data plan</li>
+            <li>Defect board live with severity rules</li>
+            <li>Integration test cases for each website flow, including the authentication check</li>
+            <li>Entry criteria signed off</li>
+            <li>Tester briefing</li>
+          </ul>
+        </div>
+      </li>
+      <li class="reveal later">
+        <div class="card">
+          <div class="tl-head"><span class="tl-week">WEEK 3</span><h3>UAT cycle 1</h3><span class="badge badge-indigo">Dated in the Week 1 calendar</span></div>
+          <ul class="deliv">
+            <li>Execution support</li>
+            <li>Daily triage</li>
+            <li>Defect log</li>
+            <li>Integration test runs with the website team</li>
+            <li>Weekly status</li>
+          </ul>
+        </div>
+      </li>
+      <li class="reveal later">
+        <div class="card">
+          <div class="tl-head"><span class="tl-week">WEEK 4</span><h3>Fixes and cycle 2</h3><span class="badge badge-indigo">Dated in the Week 1 calendar</span></div>
+          <ul class="deliv">
+            <li>Retest and regression</li>
+            <li>Go/no-go pack</li>
+            <li>Cutover checklist</li>
+            <li>Deployment readiness</li>
+          </ul>
+        </div>
+      </li>
+      <li class="reveal later">
+        <div class="card">
+          <div class="tl-head"><span class="tl-week">WEEK 5</span><h3>Go-live</h3><span class="badge badge-indigo">Dated in the Week 1 calendar</span></div>
+          <ul class="deliv">
+            <li>Go/no-go decision</li>
+            <li>Deployment</li>
+            <li>Hypercare week 1</li>
+          </ul>
+        </div>
+      </li>
+      <li class="reveal later">
+        <div class="card">
+          <div class="tl-head"><span class="tl-week">WEEK 6</span><h3>Hypercare and handover</h3><span class="badge badge-indigo">Dated in the Week 1 calendar</span></div>
+          <ul class="deliv">
+            <li>Hypercare week 2</li>
+            <li>Runbook</li>
+            <li>Open backlog</li>
+            <li>Steady-state monthly plan</li>
+          </ul>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec" id="uat-flow" aria-labelledby="uat-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">04 / UAT flow</span>
+      <h2 id="uat-title">How UAT runs, end to end</h2>
+      <p>From the discovery recordings to hypercare, with a written sign-off before anything reaches production.</p>
+    </div>
+    <figure class="diagram reveal" style="margin:0">
+      <svg class="dg only-wide" viewBox="0 0 1080 330" role="img" aria-label="UAT flow in ten steps: 1 Discovery recordings, 2 Requirements matrix, 3 UAT scripts by role, 4 Cycle 1: find defects, 5 Daily triage and fixes, 6 Cycle 2: retest and regression, 7 Go/no-go sign-off, 8 Validate-only deployment, 9 Quick deploy within 10 days, 10 Hypercare.">
+        <title>UAT flow</title>
+        <defs><marker id="uw-h" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="hd" d="M0 0L10 5L0 10z"/></marker></defs>
+        <g>
+          <rect class="node" x="20" y="30" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="44" cy="56" r="13"/><text class="n-t" x="44" y="60" text-anchor="middle">1</text>
+          <text class="t" x="36" y="92">Discovery</text><text class="t" x="36" y="112">recordings</text>
+
+          <rect class="node" x="235" y="30" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="259" cy="56" r="13"/><text class="n-t" x="259" y="60" text-anchor="middle">2</text>
+          <text class="t" x="251" y="92">Requirements</text><text class="t" x="251" y="112">matrix</text>
+
+          <rect class="node" x="450" y="30" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="474" cy="56" r="13"/><text class="n-t" x="474" y="60" text-anchor="middle">3</text>
+          <text class="t" x="466" y="92">UAT scripts</text><text class="t" x="466" y="112">by role</text>
+
+          <rect class="node" x="665" y="30" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="689" cy="56" r="13"/><text class="n-t" x="689" y="60" text-anchor="middle">4</text>
+          <text class="t" x="681" y="92">Cycle 1:</text><text class="t" x="681" y="112">find defects</text>
+
+          <rect class="node" x="880" y="30" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="904" cy="56" r="13"/><text class="n-t" x="904" y="60" text-anchor="middle">5</text>
+          <text class="t" x="896" y="92">Daily triage</text><text class="t" x="896" y="112">and fixes</text>
+
+          <rect class="node" x="20" y="210" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="44" cy="236" r="13"/><text class="n-t" x="44" y="240" text-anchor="middle">6</text>
+          <text class="t" x="36" y="272">Cycle 2: retest</text><text class="t" x="36" y="292">and regression</text>
+
+          <rect class="node gate" x="235" y="210" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="259" cy="236" r="13"/><text class="n-t" x="259" y="240" text-anchor="middle">7</text>
+          <text class="t" x="251" y="272">Go/no-go</text><text class="t" x="251" y="292">sign-off</text>
+
+          <rect class="node" x="450" y="210" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="474" cy="236" r="13"/><text class="n-t" x="474" y="240" text-anchor="middle">8</text>
+          <text class="t" x="466" y="272">Validate-only</text><text class="t" x="466" y="292">deployment</text>
+
+          <rect class="node" x="665" y="210" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="689" cy="236" r="13"/><text class="n-t" x="689" y="240" text-anchor="middle">9</text>
+          <text class="t" x="681" y="272">Quick deploy</text><text class="t" x="681" y="292">within 10 days</text>
+
+          <rect class="node" x="880" y="210" width="180" height="96" rx="16"/>
+          <circle class="n-c" cx="904" cy="236" r="13"/><text class="n-t" x="904" y="240" text-anchor="middle">10</text>
+          <text class="t" x="896" y="282">Hypercare</text>
+        </g>
+        <g>
+          <path class="ar" d="M200 78H228" marker-end="url(#uw-h)"/>
+          <path class="ar" d="M415 78H443" marker-end="url(#uw-h)"/>
+          <path class="ar" d="M630 78H658" marker-end="url(#uw-h)"/>
+          <path class="ar" d="M845 78H873" marker-end="url(#uw-h)"/>
+          <path class="ar" d="M970 126V168H110V203" marker-end="url(#uw-h)"/>
+          <path class="ar" d="M200 258H228" marker-end="url(#uw-h)"/>
+          <path class="ar" d="M415 258H443" marker-end="url(#uw-h)"/>
+          <path class="ar" d="M630 258H658" marker-end="url(#uw-h)"/>
+          <path class="ar" d="M845 258H873" marker-end="url(#uw-h)"/>
+        </g>
+      </svg>
+      <svg class="dg only-narrow" viewBox="0 0 360 600" role="img" aria-label="UAT flow in ten steps: 1 Discovery recordings, 2 Requirements matrix, 3 UAT scripts by role, 4 Cycle 1: find defects, 5 Daily triage and fixes, 6 Cycle 2: retest and regression, 7 Go/no-go sign-off, 8 Validate-only deployment, 9 Quick deploy within 10 days, 10 Hypercare.">
+        <title>UAT flow</title>
+        <defs><marker id="un-h" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="hd" d="M0 0L10 5L0 10z"/></marker></defs>
+        <g>
+          <rect class="node" x="10" y="10" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="31" cy="32" r="11"/><text class="n-t" x="31" y="36" text-anchor="middle">1</text>
+          <text class="t-sm" x="22" y="64">Discovery</text><text class="t-sm" x="22" y="82">recordings</text>
+
+          <rect class="node" x="198" y="10" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="219" cy="32" r="11"/><text class="n-t" x="219" y="36" text-anchor="middle">2</text>
+          <text class="t-sm" x="210" y="64">Requirements</text><text class="t-sm" x="210" y="82">matrix</text>
+
+          <rect class="node" x="10" y="130" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="31" cy="152" r="11"/><text class="n-t" x="31" y="156" text-anchor="middle">3</text>
+          <text class="t-sm" x="22" y="184">UAT scripts</text><text class="t-sm" x="22" y="202">by role</text>
+
+          <rect class="node" x="198" y="130" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="219" cy="152" r="11"/><text class="n-t" x="219" y="156" text-anchor="middle">4</text>
+          <text class="t-sm" x="210" y="184">Cycle 1:</text><text class="t-sm" x="210" y="202">find defects</text>
+
+          <rect class="node" x="10" y="250" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="31" cy="272" r="11"/><text class="n-t" x="31" y="276" text-anchor="middle">5</text>
+          <text class="t-sm" x="22" y="304">Daily triage</text><text class="t-sm" x="22" y="322">and fixes</text>
+
+          <rect class="node" x="198" y="250" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="219" cy="272" r="11"/><text class="n-t" x="219" y="276" text-anchor="middle">6</text>
+          <text class="t-sm" x="210" y="304">Cycle 2: retest</text><text class="t-sm" x="210" y="322">and regression</text>
+
+          <rect class="node gate" x="10" y="370" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="31" cy="392" r="11"/><text class="n-t" x="31" y="396" text-anchor="middle">7</text>
+          <text class="t-sm" x="22" y="424">Go/no-go</text><text class="t-sm" x="22" y="442">sign-off</text>
+
+          <rect class="node" x="198" y="370" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="219" cy="392" r="11"/><text class="n-t" x="219" y="396" text-anchor="middle">8</text>
+          <text class="t-sm" x="210" y="424">Validate-only</text><text class="t-sm" x="210" y="442">deployment</text>
+
+          <rect class="node" x="10" y="490" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="31" cy="512" r="11"/><text class="n-t" x="31" y="516" text-anchor="middle">9</text>
+          <text class="t-sm" x="22" y="544">Quick deploy</text><text class="t-sm" x="22" y="562">within 10 days</text>
+
+          <rect class="node" x="198" y="490" width="152" height="84" rx="14"/>
+          <circle class="n-c" cx="219" cy="512" r="11"/><text class="n-t" x="219" y="516" text-anchor="middle">10</text>
+          <text class="t-sm" x="210" y="552">Hypercare</text>
+        </g>
+        <g>
+          <path class="ar" d="M162 52H191" marker-end="url(#un-h)"/>
+          <path class="ar" d="M274 94V112H86V123" marker-end="url(#un-h)"/>
+          <path class="ar" d="M162 172H191" marker-end="url(#un-h)"/>
+          <path class="ar" d="M274 214V232H86V243" marker-end="url(#un-h)"/>
+          <path class="ar" d="M162 292H191" marker-end="url(#un-h)"/>
+          <path class="ar" d="M274 334V352H86V363" marker-end="url(#un-h)"/>
+          <path class="ar" d="M162 412H191" marker-end="url(#un-h)"/>
+          <path class="ar" d="M274 454V472H86V483" marker-end="url(#un-h)"/>
+          <path class="ar" d="M162 532H191" marker-end="url(#un-h)"/>
+        </g>
+      </svg>
+    </figure>
+    <div class="notes">
+      <div class="card reveal"><span class="num" aria-hidden="true">1</span><p>Salesforce positions Partial Copy sandboxes for quality assurance tasks such as user acceptance testing, integration testing and training <a class="cite" href="#src-S1">S1</a>.</p></div>
+      <div class="card reveal"><span class="num" aria-hidden="true">2</span><p>A validated deployment can be quick-deployed within 10 days without re-running Apex tests <a class="cite" href="#src-S16">S16</a><a class="cite" href="#src-S17">S17</a>.</p></div>
+      <div class="card reveal"><span class="num" aria-hidden="true">3</span><p>Salesforce frames UAT around test scripts, testers, stakeholder sign-off and a go/no-go decision <a class="cite" href="#src-S20">S20</a>.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="integration" aria-labelledby="int-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">05 / Integration checkpoints</span>
+      <h2 id="int-title">Integration checkpoints</h2>
+      <p>We don't assume how your website talks to Salesforce. These are the checkpoints we verify in integration testing.</p>
+    </div>
+    <figure class="diagram reveal" style="margin:0">
+      <svg class="dg only-wide" viewBox="0 0 1080 580" role="img" aria-label="Integration checkpoints. The .NET backend on AWS keeps its secrets in AWS Secrets Manager and connects over OAuth 2.0, using client credentials or JWT, to an External Client App, then to the Salesforce REST API, which upserts by External ID into the Salesforce org running NPSP or Agentforce Nonprofit with Service Cloud cases. Failed writes retry, then go to an SQS dead-letter queue. Only if needed, platform events or Change Data Capture flow from the org through Event Relay to Amazon EventBridge.">
+        <title>Integration checkpoints</title>
+        <defs><marker id="iw-h" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="hd" d="M0 0L10 5L0 10z"/></marker></defs>
+        <rect class="region" x="12" y="12" width="286" height="556" rx="18"/>
+        <text class="rl" x="32" y="552">AWS</text>
+        <rect class="region" x="470" y="12" width="598" height="556" rx="18"/>
+        <text class="rl" x="490" y="552">SALESFORCE</text>
+
+        <rect class="node-2" x="36" y="50" width="238" height="60" rx="14"/>
+        <text class="t" x="155" y="85" text-anchor="middle">Amazon EventBridge</text>
+
+        <rect class="node-2" x="600" y="50" width="170" height="60" rx="14"/>
+        <text class="t" x="685" y="85" text-anchor="middle">Event Relay</text>
+
+        <rect class="node-2" x="860" y="40" width="180" height="80" rx="14"/>
+        <text class="t-sm" x="950" y="75" text-anchor="middle">Platform events /</text>
+        <text class="t-sm" x="950" y="95" text-anchor="middle">Change Data Capture</text>
+
+        <rect class="node" x="36" y="200" width="238" height="180" rx="18"/>
+        <text class="t" x="56" y="232">.NET backend on AWS</text>
+        <rect class="node-2" x="54" y="254" width="202" height="104" rx="12"/>
+        <path d="M74 282a7 7 0 1 1 7 7h-2v7h-5v-5" fill="none" stroke="var(--dg-arrow)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <text class="s" x="96" y="290">Secrets in</text>
+        <text class="t-sm" x="74" y="326">AWS Secrets Manager</text>
+
+        <rect class="node" x="490" y="240" width="150" height="100" rx="16"/>
+        <text class="t" x="565" y="286" text-anchor="middle">External</text>
+        <text class="t" x="565" y="306" text-anchor="middle">Client App</text>
+
+        <rect class="node" x="670" y="225" width="160" height="130" rx="16"/>
+        <text class="t" x="750" y="258" text-anchor="middle">Salesforce</text>
+        <text class="t" x="750" y="278" text-anchor="middle">REST API:</text>
+        <text class="s" x="750" y="304" text-anchor="middle">upsert by</text>
+        <text class="s" x="750" y="322" text-anchor="middle">External ID</text>
+
+        <rect class="node gate" x="860" y="200" width="180" height="180" rx="18"/>
+        <text class="t" x="950" y="248" text-anchor="middle">Salesforce org</text>
+        <text class="s" x="950" y="280" text-anchor="middle">NPSP or</text>
+        <text class="s" x="950" y="299" text-anchor="middle">Agentforce Nonprofit,</text>
+        <text class="s" x="950" y="326" text-anchor="middle">Service Cloud cases</text>
+
+        <rect class="node" x="36" y="450" width="238" height="80" rx="16"/>
+        <text class="t-sm" x="155" y="484" text-anchor="middle">Retry, then</text>
+        <text class="t-sm" x="155" y="504" text-anchor="middle">SQS dead-letter queue</text>
+
+        <path class="ar" d="M274 290H483" marker-end="url(#iw-h)"/>
+        <rect class="pill" x="285" y="228" width="190" height="42" rx="12"/>
+        <text class="pt" x="380" y="245" text-anchor="middle">OAuth 2.0:</text>
+        <text class="pt" x="380" y="261" text-anchor="middle">client credentials or JWT</text>
+        <path class="ar" d="M640 290H663" marker-end="url(#iw-h)"/>
+        <path class="ar" d="M830 290H853" marker-end="url(#iw-h)"/>
+        <path class="ar" d="M155 380V443" marker-end="url(#iw-h)"/>
+
+        <path class="ar-d" d="M950 200V127" marker-end="url(#iw-h)"/>
+        <path class="ar-d" d="M860 80H777" marker-end="url(#iw-h)"/>
+        <path class="ar-d" d="M600 80H281" marker-end="url(#iw-h)"/>
+        <rect class="pill" x="330" y="64" width="130" height="32" rx="16"/>
+        <text class="pt" x="395" y="85" text-anchor="middle">only if needed</text>
+      </svg>
+      <svg class="dg only-narrow" viewBox="0 0 360 900" role="img" aria-label="Integration checkpoints. The .NET backend on AWS keeps its secrets in AWS Secrets Manager and connects over OAuth 2.0, using client credentials or JWT, to an External Client App, then to the Salesforce REST API, which upserts by External ID into the Salesforce org running NPSP or Agentforce Nonprofit with Service Cloud cases. Failed writes retry, then go to an SQS dead-letter queue. Only if needed, platform events or Change Data Capture flow from the org through Event Relay to Amazon EventBridge.">
+        <title>Integration checkpoints</title>
+        <defs><marker id="in-h" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="hd" d="M0 0L10 5L0 10z"/></marker></defs>
+        <rect class="node" x="10" y="10" width="340" height="138" rx="16"/>
+        <text class="t" x="26" y="40">.NET backend on AWS</text>
+        <rect class="node-2" x="26" y="56" width="308" height="76" rx="12"/>
+        <path d="M44 88a7 7 0 1 1 7 7h-2v7h-5v-5" fill="none" stroke="var(--dg-arrow)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <text class="s" x="66" y="88">Secrets in</text>
+        <text class="t-sm" x="66" y="110">AWS Secrets Manager</text>
+
+        <rect class="node" x="236" y="206" width="114" height="100" rx="14"/>
+        <text class="s" x="293" y="236" text-anchor="middle">Retry, then</text>
+        <text class="t-sm" x="293" y="258" text-anchor="middle">SQS</text>
+        <text class="t-sm" x="293" y="276" text-anchor="middle">dead-letter</text>
+        <text class="t-sm" x="293" y="294" text-anchor="middle">queue</text>
+        <path class="ar" d="M293 148V199" marker-end="url(#in-h)"/>
+
+        <path class="ar" d="M116 148V227" marker-end="url(#in-h)"/>
+        <rect class="pill" x="14" y="164" width="204" height="42" rx="12"/>
+        <text class="pt" x="116" y="181" text-anchor="middle">OAuth 2.0:</text>
+        <text class="pt" x="116" y="197" text-anchor="middle">client credentials or JWT</text>
+
+        <rect class="node" x="10" y="234" width="212" height="60" rx="14"/>
+        <text class="t" x="116" y="269" text-anchor="middle">External Client App</text>
+        <path class="ar" d="M116 294V321" marker-end="url(#in-h)"/>
+
+        <rect class="node" x="10" y="328" width="212" height="76" rx="14"/>
+        <text class="t" x="116" y="360" text-anchor="middle">Salesforce REST API:</text>
+        <text class="s" x="116" y="382" text-anchor="middle">upsert by External ID</text>
+        <path class="ar" d="M116 404V433" marker-end="url(#in-h)"/>
+
+        <rect class="node gate" x="10" y="440" width="340" height="106" rx="16"/>
+        <text class="t" x="180" y="474" text-anchor="middle">Salesforce org</text>
+        <text class="s" x="180" y="498" text-anchor="middle">NPSP or Agentforce Nonprofit,</text>
+        <text class="s" x="180" y="520" text-anchor="middle">Service Cloud cases</text>
+
+        <path class="ar-d" d="M180 546V609" marker-end="url(#in-h)"/>
+        <rect class="pill" x="118" y="562" width="124" height="30" rx="15"/>
+        <text class="pt" x="180" y="582" text-anchor="middle">only if needed</text>
+
+        <rect class="node-2" x="10" y="616" width="340" height="62" rx="14"/>
+        <text class="t-sm" x="180" y="652" text-anchor="middle">Platform events / Change Data Capture</text>
+        <path class="ar-d" d="M180 678V715" marker-end="url(#in-h)"/>
+
+        <rect class="node-2" x="10" y="722" width="340" height="56" rx="14"/>
+        <text class="t" x="180" y="755" text-anchor="middle">Event Relay</text>
+        <path class="ar-d" d="M180 778V815" marker-end="url(#in-h)"/>
+
+        <rect class="node-2" x="10" y="822" width="340" height="56" rx="14"/>
+        <text class="t" x="180" y="855" text-anchor="middle">Amazon EventBridge</text>
+      </svg>
+    </figure>
+    <ol class="checks">
+      <li class="reveal"><strong>Secrets stay out of code:</strong> AWS Secrets Manager stores and rotates OAuth tokens and API keys, so credentials are not hard-coded in source <a class="cite" href="#src-A1">A1</a>.</li>
+      <li class="reveal"><strong>New integrations use External Client Apps:</strong> since Spring '26, creating new connected apps is disabled by default, and existing ones keep working <a class="cite" href="#src-S7">S7</a><a class="cite" href="#src-S8">S8</a>.</li>
+      <li class="reveal"><strong>No username-password logins:</strong> Salesforce is deprecating that OAuth flow and recommends migrating to more secure flows such as client credentials <a class="cite" href="#src-S9">S9</a>.</li>
+      <li class="reveal"><strong>A dedicated API-only integration user:</strong> Enterprise, Unlimited and Performance orgs include five Salesforce Integration user licenses <a class="cite" href="#src-S10">S10</a>.</li>
+      <li class="reveal"><strong>No duplicates on retry:</strong> writes upsert on an External ID, so a matched record is updated instead of created again <a class="cite" href="#src-S12">S12</a>.</li>
+      <li class="reveal"><strong>Failures are inspectable:</strong> messages that are not processed successfully move to an SQS dead-letter queue <a class="cite" href="#src-A2">A2</a>.</li>
+      <li class="reveal"><strong>API budget checked:</strong> Enterprise Edition gets 100,000 API calls per 24 hours plus 1,000 per Salesforce license <a class="cite" href="#src-S11">S11</a>.</li>
+      <li class="reveal"><strong>Form caps known:</strong> Web-to-Case captures up to 5,000 cases per 24 hours <a class="cite" href="#src-S6">S6</a>.</li>
+      <li class="reveal"><strong>Events only if needed:</strong> Event Relay forwards custom platform events and Change Data Capture events to Amazon EventBridge <a class="cite" href="#src-S13">S13</a><a class="cite" href="#src-S14">S14</a>.</li>
+      <li class="reveal"><strong>Test data handled:</strong> masking sandbox data with Data Mask &amp; Seed needs the Salesforce Data Mask add-on license <a class="cite" href="#src-S19">S19</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec" id="day-one" aria-labelledby="day-title">
+  <div class="wrap">
+    <div class="callout reveal">
+      <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.1" fill="currentColor"/></svg></div>
+      <span class="kicker">06 / Day one</span>
+      <h2 id="day-title">Two platform changes to check on day one</h2>
+      <p>Salesforce is deprecating the OAuth username-password flow, and since Spring '26 new connected apps are disabled by default, so new integrations go through External Client Apps. If a backend still logs in with a username and password, moving it to client credentials or JWT belongs in the UAT plan, not after launch. <a class="cite" href="#src-S7">S7</a><a class="cite" href="#src-S8">S8</a><a class="cite" href="#src-S9">S9</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="weekly" aria-labelledby="weekly-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">07 / What you see each week</span>
+      <h2 id="weekly-title">What you see each week</h2>
+      <p>The working artifacts you review before each weekly approval.</p>
+    </div>
+    <div class="apps">
+      <article class="app reveal" aria-labelledby="app1">
+        <div class="app-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><h3 class="app-title" id="app1">Requirements matrix</h3><span class="illus">Illustrative format, not your data</span></div>
+        <div class="app-body">
+          <table class="ui">
+            <thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Built</th><th scope="col">Script</th><th scope="col">Status</th></tr></thead>
+            <tbody><tr>
+              <td data-label="ID"><span class="mono">REQ-014</span></td>
+              <td data-label="Requirement">Online donation creates a gift record and a receipt</td>
+              <td data-label="Built">Donation flow and receipt email</td>
+              <td data-label="Script"><span class="mono">UAT-031</span></td>
+              <td data-label="Status"><span class="status st-teal">Ready for UAT</span></td>
+            </tr></tbody>
+          </table>
+        </div>
+      </article>
+      <article class="app reveal" aria-labelledby="app2">
+        <div class="app-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><h3 class="app-title" id="app2">UAT script</h3><span class="illus">Illustrative format, not your data</span></div>
+        <div class="app-body">
+          <dl class="kv">
+            <dt>Script</dt><dd><span class="mono">UAT-031</span></dd>
+            <dt>Role</dt><dd>Development officer</dd>
+            <dt>Steps</dt><dd><ol><li>Submit a test donation on the website</li><li>Open the donor record</li><li>Confirm the gift and the receipt</li></ol></dd>
+            <dt>Expected</dt><dd>One gift, no duplicate contact</dd>
+            <dt>Result</dt><dd><span class="pf"><span>Pass</span><span>Fail</span></span></dd>
+          </dl>
+        </div>
+      </article>
+      <article class="app reveal" aria-labelledby="app3">
+        <div class="app-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><h3 class="app-title" id="app3">Defect board</h3><span class="illus">Illustrative format, not your data</span></div>
+        <div class="app-body">
+          <div class="kanban">
+            <div class="lane" aria-hidden="true"><h4>In progress</h4><div class="ghost"></div><div class="ghost"></div></div>
+            <div class="lane">
+              <h4>Ready for retest</h4>
+              <div class="ticket">
+                <div class="row"><span class="mono">DEF-007</span><span class="status st-amber">Severity 2</span></div>
+                <p>Duplicate contact created on retry</p>
+                <dl>
+                  <dt>Owner</dt><dd>Website team</dd>
+                  <dt>Fix target</dt><dd>2 business days</dd>
+                  <dt>Status</dt><dd>Ready for retest</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article class="app reveal" aria-labelledby="app4">
+        <div class="app-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><h3 class="app-title" id="app4">Weekly deliverables, Week 2</h3><span class="illus">Illustrative format, not your data</span></div>
+        <div class="app-body">
+          <table class="ui">
+            <thead><tr><th scope="col">Day</th><th scope="col">Deliverable</th><th scope="col">State</th></tr></thead>
+            <tbody>
+              <tr><td data-label="Day"><span class="mono">Mon</span></td><td data-label="Deliverable">Scripts for fundraising roles</td><td data-label="State"><span class="status st-indigo">Scheduled</span></td></tr>
+              <tr><td data-label="Day"><span class="mono">Wed</span></td><td data-label="Deliverable">Integration test cases for three website flows</td><td data-label="State"><span class="status st-indigo">Scheduled</span></td></tr>
+              <tr><td data-label="Day"><span class="mono">Fri</span></td><td data-label="Deliverable">Entry criteria sign-off</td><td data-label="State"><span class="status st-indigo">Scheduled</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="governance" aria-labelledby="gov-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">08 / Governance</span>
+      <h2 id="gov-title">Governance cadence</h2>
+    </div>
+    <div class="grid-3 cadence">
+      <div class="card reveal"><h3><span class="badge badge-teal">Daily</span></h3><ul><li>Defect triage with your engineers, in US Eastern hours</li></ul></div>
+      <div class="card reveal"><h3><span class="badge badge-indigo">Weekly</span></h3><ul><li>Deliverables review and milestone approval</li><li>Status report (red, amber, green)</li><li>Risk and issue log update</li></ul></div>
+      <div class="card reveal"><h3><span class="badge badge-amber">Checkpoints</span></h3><ul><li>Entry criteria sign-off</li><li>Go/no-go</li><li>Handover</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="team" aria-labelledby="team-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">09 / The team</span>
+      <h2 id="team-title">The team behind the role</h2>
+    </div>
+    <div class="team">
+      <p class="big reveal">Salesforce consultants, admins, developers and architects, holding between 5 and 12 Salesforce certifications each, plus .NET and AWS engineers for the website side. One lead is your point of contact, and the work doesn't stall when someone is out.</p>
+      <ul class="roles reveal" aria-label="Roles on the team">
+        <li>Salesforce consultants</li><li>Admins</li><li>Developers</li><li>Architects</li><li>.NET engineers</li><li>AWS engineers</li><li>One lead</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="scope" aria-labelledby="scope-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">10 / Scope</span>
+      <h2 id="scope-title">Scope boundaries</h2>
+    </div>
+    <div class="grid-2 scope">
+      <div class="card reveal"><h3>In scope</h3><ul><li>The four outcomes above: requirements baseline, UAT from start to finish, the website side, and engagement ownership</li></ul></div>
+      <div class="card reveal out"><h3>Not in scope unless agreed</h3><ul><li>Build changes in Salesforce (your engineers)</li><li>.NET code changes (the website team)</li><li>License purchases</li><li>Running a data migration</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="needs" aria-labelledby="needs-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">11 / What we need</span>
+      <h2 id="needs-title">What we need from you, in writing</h2>
+    </div>
+    <ul class="needs">
+      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Discovery recordings</li>
+      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Sandbox access and read-only production access</li>
+      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Access to your defect tool (Trello or Asana)</li>
+      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>A contact on the website team</li>
+      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>The current open-items list</li>
+      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>The target go-live date</li>
+      <li class="reveal"><span class="box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>The number of business testers</li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec" id="questions" aria-labelledby="q-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">12 / Questions</span>
+      <h2 id="q-title">Four questions to lock Week 1</h2>
+    </div>
+    <ol class="qs">
+      <li class="reveal">Is the org on NPSP or Agentforce Nonprofit (formerly Nonprofit Cloud), and is Service Cloud in scope?</li>
+      <li class="reveal">Which sandbox is UAT running in, and is the test data masked?</li>
+      <li class="reveal">Which website flows write to Salesforce, and how does the .NET backend authenticate today?</li>
+      <li class="reveal">What is the target go-live date, and how many business testers will you have?</li>
+    </ol>
+    <div class="note reveal"><p>Agentforce Nonprofit is the current name of Nonprofit Cloud <a class="cite" href="#src-N1">N1</a>.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="sources" aria-labelledby="src-title">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">13 / Sources</span>
+      <h2 id="src-title">Sources</h2>
+      <p>Official vendor documentation behind each cited fact. Links open in a new tab.</p>
+    </div>
+    <ol class="sources">
+      <li id="src-R1"><span class="src-id">R1</span><div><a href="https://trailhead.salesforce.com/career-path/consultant/" target="_blank" rel="noopener noreferrer">Salesforce Consultant Careers</a><span class="dom">trailhead.salesforce.com</span></div></li>
+      <li id="src-R2"><span class="src-id">R2</span><div><a href="https://trailhead.salesforce.com/content/learn/modules/salesforce-business-analyst-certification-prep/get-started-with-salesforce-business-analyst-certification-prep" target="_blank" rel="noopener noreferrer">Salesforce Business Analyst Certification Prep</a><span class="dom">trailhead.salesforce.com</span></div></li>
+      <li id="src-U1"><span class="src-id">U1</span><div><a href="https://support.upwork.com/hc/en-us/articles/211063418-How-hourly-and-fixed-price-contracts-are-different-on-Upwork" target="_blank" rel="noopener noreferrer">How hourly and fixed-price contracts are different on Upwork</a><span class="dom">support.upwork.com</span></div></li>
+      <li id="src-S1"><span class="src-id">S1</span><div><a href="https://help.salesforce.com/s/articleView?id=platform.create_test_instance.htm&amp;type=5" target="_blank" rel="noopener noreferrer">Sandbox Types and Templates</a><span class="dom">help.salesforce.com</span></div></li>
+      <li id="src-S6"><span class="src-id">S6</span><div><a href="https://help.salesforce.com/s/articleView?id=service.customizesupport_web_to_case_notes.htm&amp;type=5" target="_blank" rel="noopener noreferrer">Web-to-Case Guidelines and Limits</a><span class="dom">help.salesforce.com</span></div></li>
+      <li id="src-S7"><span class="src-id">S7</span><div><a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_security_identity_connected_app_creation_disabled.htm&amp;release=260&amp;type=5" target="_blank" rel="noopener noreferrer">Creation of New Connected Apps Is Disabled by Default</a><span class="dom">help.salesforce.com, Spring '26 release notes</span></div></li>
+      <li id="src-S8"><span class="src-id">S8</span><div><a href="https://help.salesforce.com/s/articleView?id=005228017&amp;type=1" target="_blank" rel="noopener noreferrer">New Connected Apps Can No Longer Be Created in Spring '26</a><span class="dom">help.salesforce.com</span></div></li>
+      <li id="src-S9"><span class="src-id">S9</span><div><a href="https://help.salesforce.com/s/articleView?id=000886201&amp;type=1" target="_blank" rel="noopener noreferrer">Migrate from OAuth Username-Password to Client Credentials Flow</a><span class="dom">help.salesforce.com</span></div></li>
+      <li id="src-S10"><span class="src-id">S10</span><div><a href="https://help.salesforce.com/s/articleView?id=platform.users_license_types_available.htm&amp;type=5" target="_blank" rel="noopener noreferrer">Standard User Licenses</a><span class="dom">help.salesforce.com</span></div></li>
+      <li id="src-S11"><span class="src-id">S11</span><div><a href="https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_api.htm" target="_blank" rel="noopener noreferrer">API Request Limits and Allocations</a><span class="dom">developer.salesforce.com</span></div></li>
+      <li id="src-S12"><span class="src-id">S12</span><div><a href="https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_upsert.htm" target="_blank" rel="noopener noreferrer">Insert or Update (Upsert) a Record Using an External ID</a><span class="dom">developer.salesforce.com</span></div></li>
+      <li id="src-S13"><span class="src-id">S13</span><div><a href="https://help.salesforce.com/s/articleView?id=platform.get_started.htm&amp;type=5" target="_blank" rel="noopener noreferrer">Event Relay: Get Started</a><span class="dom">help.salesforce.com</span></div></li>
+      <li id="src-S14"><span class="src-id">S14</span><div><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-saas-salesforce.html" target="_blank" rel="noopener noreferrer">Receiving events from Salesforce in Amazon EventBridge</a><span class="dom">docs.aws.amazon.com</span></div></li>
+      <li id="src-S16"><span class="src-id">S16</span><div><a href="https://developer.salesforce.com/docs/platform/salesforce-cli-reference/guide/cli_reference_project_deploy_validate.html" target="_blank" rel="noopener noreferrer">project deploy validate</a><span class="dom">developer.salesforce.com, Salesforce CLI reference</span></div></li>
+      <li id="src-S17"><span class="src-id">S17</span><div><a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deployRecentValidation.htm" target="_blank" rel="noopener noreferrer">deployRecentValidation()</a><span class="dom">developer.salesforce.com, Metadata API guide</span></div></li>
+      <li id="src-S19"><span class="src-id">S19</span><div><a href="https://help.salesforce.com/s/articleView?id=platform.data_mask_and_seed.htm&amp;type=5" target="_blank" rel="noopener noreferrer">Protect Sensitive Data with Data Mask &amp; Seed</a><span class="dom">help.salesforce.com</span></div></li>
+      <li id="src-S20"><span class="src-id">S20</span><div><a href="https://trailhead.salesforce.com/content/learn/modules/salesforce-business-analyst-certification-prep/explore-user-acceptance" target="_blank" rel="noopener noreferrer">User Acceptance Test Plan and Go/No-Go Release Decision</a><span class="dom">trailhead.salesforce.com</span></div></li>
+      <li id="src-A1"><span class="src-id">A1</span><div><a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html" target="_blank" rel="noopener noreferrer">What is AWS Secrets Manager?</a><span class="dom">docs.aws.amazon.com</span></div></li>
+      <li id="src-A2"><span class="src-id">A2</span><div><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html" target="_blank" rel="noopener noreferrer">Using dead-letter queues in Amazon SQS</a><span class="dom">docs.aws.amazon.com</span></div></li>
+      <li id="src-N1"><span class="src-id">N1</span><div><a href="https://www.salesforce.com/news/stories/agentforce-nonprofit-announcement/" target="_blank" rel="noopener noreferrer">Salesforce Introduces Agentforce Nonprofit</a><span class="dom">salesforce.com</span></div></li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav aria-label="Footer">
+      <ul>
+        <li><a href="#top">Top</a></li>
+        <li><a href="#role">Role</a></li>
+        <li><a href="#how">How we work</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#uat-flow">UAT flow</a></li>
+        <li><a href="#integration">Integration</a></li>
+        <li><a href="#day-one">Day one</a></li>
+        <li><a href="#weekly">Weekly artifacts</a></li>
+        <li><a href="#governance">Governance</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#scope">Scope</a></li>
+        <li><a href="#needs">What we need</a></li>
+        <li><a href="#questions">Questions</a></li>
+        <li><a href="#sources">Sources</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("fx");
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.06 });
+    Array.prototype.forEach.call(document.querySelectorAll(".reveal"), function (el) { io.observe(el); });
+    window.addEventListener("beforeprint", function () {
+      Array.prototype.forEach.call(document.querySelectorAll(".reveal"), function (el) { el.classList.add("in"); });
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    var list = document.getElementById("navlist");
+    var links = {};
+    Array.prototype.forEach.call(list.querySelectorAll("a"), function (a) { links[a.getAttribute("href").slice(1)] = a; });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var a = links[e.target.id];
+        if (!a || !e.isIntersecting) { return; }
+        Object.keys(links).forEach(function (k) { links[k].classList.remove("on"); links[k].removeAttribute("aria-current"); });
+        a.classList.add("on");
+        a.setAttribute("aria-current", "true");
+        var left = a.offsetLeft - (list.clientWidth - a.offsetWidth) / 2;
+        list.scrollTo({ left: left, behavior: reduce ? "auto" : "smooth" });
+      });
+    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+    Object.keys(links).forEach(function (id) { var s = document.getElementById(id); if (s) { spy.observe(s); } });
+  }
+})();
+</script>
+</body>
+</html>
